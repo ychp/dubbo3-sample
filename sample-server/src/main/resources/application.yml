@@ -1,0 +1,19 @@
+# application.yml
+dubbo:
+  registry:
+    address: nacos://${nacos.address:127.0.0.1}:6848?username=dmd&password=anywhere
+    register-mode: instance
+  protocols:
+    tri:
+      name: tri
+      port: 50051
+      host: 127.0.0.1
+    dubbo:
+      name: dubbo
+      port: 20880
+      host: 127.0.0.1
+  application:
+    name: SampleServer
+    logger: slf4j
+  provider:
+    host: 127.0.0.1
