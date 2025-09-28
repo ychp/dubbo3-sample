@@ -1,8 +1,11 @@
 package com.ycp.sample.service.impl;
 
 import com.ycp.sample.api.SampleStreamingService;
+import com.ycp.sample.component.LongMethodComponent;
 import org.apache.dubbo.common.stream.StreamObserver;
 import org.apache.dubbo.config.annotation.DubboService;
+
+import javax.annotation.Resource;
 
 /**
  * @author yingchengpeng
@@ -10,16 +13,17 @@ import org.apache.dubbo.config.annotation.DubboService;
  */
 @DubboService(protocol = "tri")
 public class SampleStreamingServiceImpl implements SampleStreamingService {
+    @Resource
+    private LongMethodComponent longMethodComponent;
 
     @Override
     public void longRunningOnlyInput(String input, StreamObserver<String> response) {
         try {
-            Thread.sleep(3000L);
-        } catch (InterruptedException e) {
+            response.onNext(longMethodComponent.longMethod(input));
+        } catch (Exception e) {
             response.onError(e);
             return;
         }
-        response.onNext(input);
         response.onCompleted();
     }
 
@@ -33,12 +37,11 @@ public class SampleStreamingServiceImpl implements SampleStreamingService {
             public void onNext(String data) {
                 try {
                     isSleep = true;
-                    Thread.sleep(3000L);
-                    response.onNext(data);
+                    response.onNext(longMethodComponent.longMethod(data));
                     if (isCompleted) {
                         response.onCompleted();
                     }
-                } catch (InterruptedException e) {
+                } catch (Exception e) {
                     response.onError(e);
                 } finally {
                     isSleep = false;

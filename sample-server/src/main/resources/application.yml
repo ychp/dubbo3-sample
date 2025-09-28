@@ -17,3 +17,5 @@ dubbo:
     logger: slf4j
   provider:
     host: 127.0.0.1
+    filter: dubboLog
+    threads: 5

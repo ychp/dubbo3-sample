@@ -1,7 +1,10 @@
 package com.ycp.sample.service.impl;
 
 import com.ycp.sample.api.SampleService;
+import com.ycp.sample.component.LongMethodComponent;
 import org.apache.dubbo.config.annotation.DubboService;
+
+import javax.annotation.Resource;
 
 /**
  * @author yingchengpeng
@@ -9,13 +12,11 @@ import org.apache.dubbo.config.annotation.DubboService;
  */
 @DubboService
 public class SampleServiceImpl implements SampleService {
+    @Resource
+    private LongMethodComponent longMethodComponent;
+
     @Override
     public String longRunning(String input) {
-        try {
-            Thread.sleep(3000L);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        return input;
+        return longMethodComponent.longMethod(input);
     }
 }

@@ -9,6 +9,8 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.dubbo.config.annotation.Method;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -17,40 +19,44 @@ import java.util.concurrent.ExecutionException;
  * @date 2025/9/26 17:23
  */
 @Slf4j
-@DubboService(protocol = "tri", timeout = 20000)
+@DubboService(protocol = "tri", timeout = 60000)
 public class SampleTestServiceImpl implements SampleTestService {
 
-    @DubboReference(timeout = 5000)
+    @DubboReference(timeout = 10000)
     private SampleService sampleService;
 
-    @DubboReference(protocol = "tri", timeout = 5000, methods = {
+    @DubboReference(protocol = "tri", timeout = 3000, methods = {
             @Method(name = "longRunningOnlyInput", async = true)
     })
     private SampleStreamingService sampleStreamingService;
 
     @Override
-    public void test() {
+    public void test() throws ExecutionException, InterruptedException {
         long startTime = System.currentTimeMillis();
         log.info("开始测试");
         String result = sampleService.longRunning("hello world");
         log.info("常规调用，耗时 {} ms, 结果：{}", System.currentTimeMillis() - startTime, result);
+
         startTime = System.currentTimeMillis();
-        try {
-            result = getCompleteContentByResponse();
-            log.info("只有response的流式通信，耗时 {} ms, 结果：{}", System.currentTimeMillis() - startTime, result);
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        result = getCompleteContentByResponse();
+        log.info("只有response的流式通信，耗时 {} ms, 结果：{}", System.currentTimeMillis() - startTime, result);
+
+        startTime = System.currentTimeMillis();
+        CompletableFuture<String> resultFuture = getCompleteContent();
+        result = resultFuture.get();
+        log.info("标准流式通信，耗时 {} ms, 结果：{}", System.currentTimeMillis() - startTime, result);
+
+        List<CompletableFuture<String>> futures = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            startTime = System.currentTimeMillis();
+            futures.add(getCompleteContent());
+            log.info("标准流式通信, 模拟服务端线程池满，连续调用 {}，耗时 {} ms, 结果：{}", i, System.currentTimeMillis() - startTime, result);
         }
-        startTime = System.currentTimeMillis();
-        try {
-            result = getCompleteContent();
-            log.info("标准流式通信，耗时 {} ms, 结果：{}", System.currentTimeMillis() - startTime, result);
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+
+        for (int i = 0; i < futures.size(); i++) {
+            CompletableFuture<String> future = futures.get(i);
+            result = future.get();
+            log.info("标准流式通信, 模拟服务端线程池满，连续调用 {}，耗时 {} ms, 结果：{}", i, System.currentTimeMillis() - startTime, result);
         }
 
     }
@@ -101,7 +107,7 @@ public class SampleTestServiceImpl implements SampleTestService {
     /**
      * 对外提供的接口方法，返回完整的content
      */
-    public String getCompleteContent() throws ExecutionException, InterruptedException {
+    public CompletableFuture<String> getCompleteContent() throws ExecutionException, InterruptedException {
         long startTime = System.currentTimeMillis();
         log.info("标准流式通信, 开始处理");
 
@@ -145,6 +151,6 @@ public class SampleTestServiceImpl implements SampleTestService {
         }
 
         // 阻塞等待结果完成，然后返回（会阻塞当前线程）
-        return future.get();
+        return future;
     }
 }

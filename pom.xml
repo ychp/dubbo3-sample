@@ -12,6 +12,7 @@
         <module>sample-server</module>
         <module>sample-client</module>
         <module>sample-api</module>
+        <module>sample-common</module>
     </modules>
 
     <properties>
@@ -34,6 +35,16 @@
                 <version>2.7.10</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.ycp.sample</groupId>
+                <artifactId>sample-api</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ycp.sample</groupId>
+                <artifactId>sample-common</artifactId>
+                <version>1.0-SNAPSHOT</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

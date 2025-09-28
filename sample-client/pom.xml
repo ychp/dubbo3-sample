@@ -20,7 +20,10 @@
         <dependency>
             <groupId>com.ycp.sample</groupId>
             <artifactId>sample-api</artifactId>
-            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.ycp.sample</groupId>
+            <artifactId>sample-common</artifactId>
         </dependency>
         <!-- spring starter -->
         <dependency>
@@ -32,13 +35,11 @@
                     <artifactId>spring-boot-starter-logging</artifactId>
                 </exclusion>
             </exclusions>
-            <version>2.7.10</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
-            <version>2.7.10</version>
         </dependency>
     </dependencies>
 

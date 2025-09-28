@@ -16,3 +16,8 @@ dubbo:
     name: SampleClient
     logger: slf4j
     qos-port: 22223
+  provider:
+    filter: dubboLog
+  consumer:
+    filter: dubboLog
+    threads: 5
