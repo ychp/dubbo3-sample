@@ -21,3 +21,4 @@ dubbo:
   consumer:
     filter: dubboLog
     threads: 5
+    timeout: 3000

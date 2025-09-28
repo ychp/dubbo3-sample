@@ -28,6 +28,17 @@ public class SampleStreamingServiceImpl implements SampleStreamingService {
     }
 
     @Override
+    public void longRunningOnlyInputSync(String input, StreamObserver<String> response) {
+        try {
+            response.onNext(longMethodComponent.longMethod(input));
+        } catch (Exception e) {
+            response.onError(e);
+            return;
+        }
+        response.onCompleted();
+    }
+
+    @Override
     public StreamObserver<String> longRunning(StreamObserver<String> response) {
         return new StreamObserver<>() {
             boolean isCompleted = false;

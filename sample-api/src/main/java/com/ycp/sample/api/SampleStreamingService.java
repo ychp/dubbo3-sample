@@ -11,5 +11,8 @@ public interface SampleStreamingService {
     void longRunningOnlyInput(String input, StreamObserver<String> response);
 
 
+    void longRunningOnlyInputSync(String input, StreamObserver<String> response);
+
+
     StreamObserver<String> longRunning(StreamObserver<String> response);
 }
